@@ -13,16 +13,19 @@ public class BodySourceView : MonoBehaviour
     
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
+        // Left foot to ass spine
         { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
         { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
         { Kinect.JointType.KneeLeft, Kinect.JointType.HipLeft },
         { Kinect.JointType.HipLeft, Kinect.JointType.SpineBase },
         
+        // Right foot to ass spine
         { Kinect.JointType.FootRight, Kinect.JointType.AnkleRight },
         { Kinect.JointType.AnkleRight, Kinect.JointType.KneeRight },
         { Kinect.JointType.KneeRight, Kinect.JointType.HipRight },
         { Kinect.JointType.HipRight, Kinect.JointType.SpineBase },
         
+        // Left hand tip to Shoulder Spine
         { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
         { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
         { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
@@ -30,80 +33,56 @@ public class BodySourceView : MonoBehaviour
         { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
         { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
         
+        // Right hand tip to shoulder spine
         { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
         { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
         { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
         { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
         { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
         { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
-        
+
+        // Ass to Head
         { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
         { Kinect.JointType.SpineMid, Kinect.JointType.SpineShoulder },
         { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
         { Kinect.JointType.Neck, Kinect.JointType.Head },
     };
     
-    void Update () 
-    {
-        if (BodySourceManager == null)
-        {
-            return;
-        }
-        
-        _BodyManager = BodySourceManager.GetComponent<BodySourceManager>();
-        if (_BodyManager == null)
-        {
-            return;
-        }
-        
-        Kinect.Body[] data = _BodyManager.GetData();
-        if (data == null)
-        {
-            return;
-        }
-        
-        List<ulong> trackedIds = new List<ulong>();
-        foreach(var body in data)
-        {
-            if (body == null)
-            {
-                continue;
-              }
-                
-            if(body.IsTracked)
-            {
-                trackedIds.Add (body.TrackingId);
-            }
-        }
-        
-        List<ulong> knownIds = new List<ulong>(_Bodies.Keys);
-        
-        // First delete untracked bodies
-        foreach(ulong trackingId in knownIds)
-        {
-            if(!trackedIds.Contains(trackingId))
-            {
-                Destroy(_Bodies[trackingId]);
-                _Bodies.Remove(trackingId);
-            }
-        }
+	void Start() {
+		if (BodySourceManager == null) return;
+		_BodyManager = BodySourceManager.GetComponent<BodySourceManager>();
+	}
 
-        foreach(var body in data)
-        {
-            if (body == null)
-            {
-                continue;
-            }
+    void Update () {
+		if (BodySourceManager == null) return;
+		if (_BodyManager == null) return;
+		Kinect.Body[] data = _BodyManager.GetData();
+		if (data == null) return;
+		List<ulong> trackedIds = new List<ulong>();
+		foreach(var body in data) {
+			if (body == null) continue;
+			if (!body.IsTracked) continue;
+			trackedIds.Add(body.TrackingId);
+		}
+		List<ulong> knownIds = new List<ulong>(_Bodies.Keys);
+        
+		// delete untracked bodies
+		foreach(ulong trackingId in knownIds){
+			if (!trackedIds.Contains(trackingId)) {
+				Destroy(_Bodies[trackingId]);
+				_Bodies.Remove(trackingId);
+			}
+		}
+
+        foreach(var body in data) {
+            if (body == null) continue;
+            if (!body.IsTracked) continue; // TODO is this really necessary? prev logic checks already
             
-            if(body.IsTracked)
-            {
-                if(!_Bodies.ContainsKey(body.TrackingId))
-                {
-                    _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
-                }
-                
-                RefreshBodyObject(body, _Bodies[body.TrackingId]);
+            if(!_Bodies.ContainsKey(body.TrackingId)) {
+                _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
             }
+
+            RefreshBodyObject(body, _Bodies[body.TrackingId]);
         }
     }
     

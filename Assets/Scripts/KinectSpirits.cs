@@ -1,14 +1,13 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
 
-public class BodySourceView : MonoBehaviour 
+public class KinectSpirits : MonoBehaviour 
 {
-    public Material BoneMaterial;
     public GameObject BodySourceManager;
     
-    private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
+    private Dictionary<ulong, GameObject> _Spirits = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
     
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
@@ -64,48 +63,45 @@ public class BodySourceView : MonoBehaviour
 			if (!body.IsTracked) continue;
 			trackedIds.Add(body.TrackingId);
 		}
-		List<ulong> knownIds = new List<ulong>(_Bodies.Keys);
+		List<ulong> knownIds = new List<ulong>(_Spirits.Keys);
         
 		// NOTE cleaning up untracked spirits seem simple(?)
 		foreach(ulong trackingId in knownIds){
 			if (!trackedIds.Contains(trackingId)) {
-				Destroy(_Bodies[trackingId]);
-				_Bodies.Remove(trackingId);
+				Destroy(_Spirits[trackingId]);
+				_Spirits.Remove(trackingId);
 			}
 		}
 
         foreach(var body in data) {
             if (body == null) continue;
-            if (!body.IsTracked) continue; // TODO is this really necessary? prev logic checks already
+            if (!body.IsTracked) continue;
             
-            if(!_Bodies.ContainsKey(body.TrackingId)) {
+            if(!_Spirits.ContainsKey(body.TrackingId)) {
                 // NOTE This would be where I create the Spirits
-                _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
+                _Spirits[body.TrackingId] = CreateSpiritObject(body.TrackingId);
             }
 
-            RefreshBodyObject(body, _Bodies[body.TrackingId]);
+            RefreshSpiritObject(body, _Spirits[body.TrackingId]);
         }
     }
     
-    private GameObject CreateBodyObject(ulong id)
+    // Initialize a spirit with strands and such
+    private GameObject CreateSpiritObject(ulong id)
     {
-        GameObject body = new GameObject("Body:" + id);
+        GameObject spirit = new GameObject("Spirit:" + id);
         
+        // TODO replace placeholder construction
+        // with actual strand attaching
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
-            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            
-            LineRenderer lr = jointObj.AddComponent<LineRenderer>();
-            lr.SetVertexCount(2);
-            lr.material = BoneMaterial;
-            lr.SetWidth(0.05f, 0.05f);
-            
+            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
             jointObj.name = jt.ToString();
-            jointObj.transform.parent = body.transform;
+            jointObj.transform.parent = spirit.transform;
         }
         
-        return body;
+        return spirit;
     }
     
     // NOTE this is the update function for Spirits.
@@ -113,8 +109,7 @@ public class BodySourceView : MonoBehaviour
     // we only update what's necessary here - aka skeleton data
     // So the roots will need to be updated here with their joints
     // and distance
-    private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
-    {
+    private void RefreshSpiritObject(Kinect.Body body, GameObject bodyObject) {
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             Kinect.Joint sourceJoint = body.Joints[jt];
@@ -127,33 +122,6 @@ public class BodySourceView : MonoBehaviour
             
             Transform jointObj = bodyObject.transform.Find(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
-            
-            LineRenderer lr = jointObj.GetComponent<LineRenderer>();
-            if(targetJoint.HasValue)
-            {
-                lr.SetPosition(0, jointObj.localPosition);
-                lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
-                lr.SetColors(GetColorForState (sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
-            }
-            else
-            {
-                lr.enabled = false;
-            }
-        }
-    }
-    
-    private static Color GetColorForState(Kinect.TrackingState state)
-    {
-        switch (state)
-        {
-        case Kinect.TrackingState.Tracked:
-            return Color.green;
-
-        case Kinect.TrackingState.Inferred:
-            return Color.red;
-
-        default:
-            return Color.black;
         }
     }
     

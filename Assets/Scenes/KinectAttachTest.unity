@@ -243,7 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BodySourceManager: {fileID: 679220914}
-  wingStrandTemplate: {fileID: 1358767409626216, guid: 4ed352fa4114c884b98b37bd15bca583,
+  wingStrandTemplate: {fileID: 1358767409626216, guid: 01a07bdb0ed989c4981d1ce801ed2daa,
     type: 2}
   bodyStrandTemplate: {fileID: 1358767409626216, guid: e497a2c15acc55741a3c335068abd3f1,
     type: 2}

@@ -15,20 +15,12 @@ public class KinectSpirits : MonoBehaviour
     private Dictionary<ulong, GameObject> _Spirits = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
     
+    // HACK _BoneMap (master) will contain all the bones we want to spawn a strand from.
+    // The other bone maps are for each sections, e.g. wing, spine...
+    // They must equate to _BoneMap added together
+
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
-        // // Left foot to ass spine
-        // { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
-        // { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
-        // { Kinect.JointType.KneeLeft, Kinect.JointType.HipLeft },
-        // { Kinect.JointType.HipLeft, Kinect.JointType.SpineBase },
-        
-        // // Right foot to ass spine
-        // { Kinect.JointType.FootRight, Kinect.JointType.AnkleRight },
-        // { Kinect.JointType.AnkleRight, Kinect.JointType.KneeRight },
-        // { Kinect.JointType.KneeRight, Kinect.JointType.HipRight },
-        // { Kinect.JointType.HipRight, Kinect.JointType.SpineBase },
-        
         // Left hand tip to Shoulder Spine
         { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
         { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
@@ -43,13 +35,31 @@ public class KinectSpirits : MonoBehaviour
         { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
         { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
         { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
-        // { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
 
-        // // Ass to Head
-        // { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
-        // { Kinect.JointType.SpineMid, Kinect.JointType.SpineShoulder },
-        // { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
-        // { Kinect.JointType.Neck, Kinect.JointType.Head },
+        // left to right shoulder
+        { Kinect.JointType.ShoulderLeft, Kinect.JointType.ShoulderRight },
+    };
+
+    private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMapWing = new Dictionary<Kinect.JointType, Kinect.JointType>()
+    {
+        // Left hand tip to Shoulder Spine
+        { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
+        { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
+        { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
+        { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
+        { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
+        
+        // Right hand tip to shoulder spine
+        { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
+        { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
+        { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
+        { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
+        { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
+    };
+    private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMapBody = new Dictionary<Kinect.JointType, Kinect.JointType>()
+    {
+        // left to right shoulder
+        { Kinect.JointType.ShoulderLeft, Kinect.JointType.ShoulderRight },
     };
     
 	void Start() {
@@ -97,9 +107,14 @@ public class KinectSpirits : MonoBehaviour
         GameObject spirit = new GameObject("Spirit:" + id);
         
         // NOTE Strand initialization time!
-        // need some changes to make the strand root locations more appealing
-        foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMap) {
+        // Initialize different types of strand
+        foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMapWing) {
             GameObject strand = Instantiate(wingStrandTemplate);
+            strand.name = bone.ToString();
+            strand.transform.parent = spirit.transform;
+        }
+        foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMapBody) {
+            GameObject strand = Instantiate(bodyStrandTemplate);
             strand.name = bone.ToString();
             strand.transform.parent = spirit.transform;
         }

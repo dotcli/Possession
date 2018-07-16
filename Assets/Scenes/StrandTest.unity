@@ -509,7 +509,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -50}
+  m_LocalPosition: {x: 0, y: 1, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -784,7 +784,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4746821123471510, guid: 4ef65aa2150349949bdfdabd7776aa4a, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4746821123471510, guid: 4ef65aa2150349949bdfdabd7776aa4a, type: 2}
       propertyPath: m_LocalPosition.y
@@ -813,6 +813,56 @@ Prefab:
     - target: {fileID: 4746821123471510, guid: 4ef65aa2150349949bdfdabd7776aa4a, type: 2}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: damper
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: segmentCount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: segmentDistanceY
+      value: -0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: spring
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: mass
+      value: 0.0001
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: minDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: angularDrag
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: drag
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: maxDistance
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114464829057795930, guid: 4ef65aa2150349949bdfdabd7776aa4a,
+        type: 2}
+      propertyPath: useGravity
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ef65aa2150349949bdfdabd7776aa4a, type: 2}

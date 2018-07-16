@@ -7,12 +7,14 @@ public class StrandRoot : MonoBehaviour {
 	public GameObject SegmentPrefab;
 
 	public int segmentCount;
+	public bool useGravity;
 	public float mass;
 	public float drag;
 	public float angularDrag;
 	public float spring;
 	public float damper;
 	public float minDistance;
+	public float maxDistance;
 	public float segmentDistanceX;
 	public float segmentDistanceY;
 	public float segmentDistanceZ;
@@ -43,6 +45,7 @@ public class StrandRoot : MonoBehaviour {
 			rick.mass = mass;
 			rick.drag = drag;
 			rick.angularDrag = angularDrag;
+			rick.useGravity = useGravity;
 		}
 
 		// add spring joints for root and all but the last dangler
@@ -50,8 +53,9 @@ public class StrandRoot : MonoBehaviour {
 		SpringJoint rootSpring = this.gameObject.AddComponent<SpringJoint>();
 		rootSpring.connectedBody = danglers[0].GetComponent<Rigidbody>();
 		rootSpring.spring = spring;
-		rootSpring.damper = 0.2f; // TODO fix magic number?
+		rootSpring.damper = damper; // 0.2f
 		rootSpring.minDistance = minDistance;
+		rootSpring.maxDistance = maxDistance;
 		// then link up the danglers
 		for (int j = 0; j < segmentCount - 1; j++) {
 			SpringJoint danglerSpring = danglers[j].AddComponent<SpringJoint>();
@@ -59,6 +63,7 @@ public class StrandRoot : MonoBehaviour {
 			danglerSpring.spring = spring;
 			danglerSpring.damper = damper;
 			danglerSpring.minDistance = minDistance;
+			danglerSpring.maxDistance = maxDistance;
 		}
 		
 		// instantiate the segments

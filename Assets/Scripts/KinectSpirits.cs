@@ -11,47 +11,26 @@ public class KinectSpirits : MonoBehaviour
     public GameObject bodyStrandTemplate;
 
     public float lerper;
+
+    public int strandPerBone = 5;
     
     private Dictionary<ulong, GameObject> _Spirits = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
+
+    // HACK this data structure is good for single player but not two
+    // TODO fix this with better data structure
+    private List<Transform> _strands;
     
-    // HACK _BoneMap (master) will contain all the bones we want to spawn a strand from.
-    // The other bone maps are for each sections, e.g. wing, spine...
-    // They must equate to _BoneMap added together
-
-    private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
-    {
-        // Left hand tip to Shoulder Spine
-        { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
-        { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
-        { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
-        { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
-        { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
-        // { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
-        
-        // Right hand tip to shoulder spine
-        { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
-        { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
-        { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
-        { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
-        { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
-
-        // left to right shoulder
-        { Kinect.JointType.ShoulderLeft, Kinect.JointType.ShoulderRight },
-    };
-
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMapWing = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
         // Left hand tip to Shoulder Spine
         { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
-        { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
         { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
         { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
         { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
         
         // Right hand tip to shoulder spine
         { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
-        { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
         { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
         { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
         { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
@@ -65,6 +44,8 @@ public class KinectSpirits : MonoBehaviour
 	void Start() {
 		if (BodySourceManager == null) return;
 		_BodyManager = BodySourceManager.GetComponent<BodySourceManager>();
+
+        _strands = new List<Transform>();
 	}
 
     void Update () {
@@ -80,9 +61,10 @@ public class KinectSpirits : MonoBehaviour
 		}
 		List<ulong> knownIds = new List<ulong>(_Spirits.Keys);
         
-		// NOTE cleaning up untracked spirits seem simple(?)
+		// NOTE cleaning up spirits that aren't tracked anymore
 		foreach(ulong trackingId in knownIds){
 			if (!trackedIds.Contains(trackingId)) {
+                _strands.Clear();
 				Destroy(_Spirits[trackingId]);
 				_Spirits.Remove(trackingId);
 			}
@@ -108,11 +90,22 @@ public class KinectSpirits : MonoBehaviour
         
         // NOTE Strand initialization time!
         // Initialize different types of strand
+        // and give strands reference to which joints to look for and how much
         foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMapWing) {
-            GameObject strand = Instantiate(wingStrandTemplate);
-            strand.name = bone.ToString();
-            strand.transform.parent = spirit.transform;
+            // many strands per bone!
+            for (int i = 0; i < strandPerBone; i++) {
+                GameObject strand = Instantiate(wingStrandTemplate);
+                strand.name = bone.ToString();
+                KinectStrandPosition positioner = strand.AddComponent<KinectStrandPosition>();
+                positioner.head = bone.Key;
+                positioner.tail = bone.Value;
+                positioner.lerper = i * (1.0f /strandPerBone);
+                strand.transform.parent = spirit.transform;
+                _strands.Add(strand.transform);
+            }
         }
+
+        
         foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMapBody) {
             GameObject strand = Instantiate(bodyStrandTemplate);
             strand.name = bone.ToString();
@@ -128,15 +121,27 @@ public class KinectSpirits : MonoBehaviour
     // So the roots will need to be updated here with their joints
     // and distance
     private void RefreshSpiritObject(Kinect.Body body, GameObject bodyObject) {
-        foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMap) {
-			Vector3 sourceJoint = GetVector3FromJoint(body.Joints[bone.Key]);
-			Vector3 targetJoint = GetVector3FromJoint(body.Joints[bone.Value]);
+        // update the body, which doesn't have multiple strands
+        foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMapBody) {
+			Vector3 headJoint = GetVector3FromJoint(body.Joints[bone.Key]);
+			Vector3 tailJoint = GetVector3FromJoint(body.Joints[bone.Value]);
 			Transform strand = bodyObject.transform.Find(bone.ToString());
 			// calculate position using the avg of two joints,
             // with a lerper to smoothen the movement
-            strand.localPosition = Vector3.Lerp(strand.localPosition, (sourceJoint + targetJoint) / 2.0f, lerper);
-            strand.localRotation.SetFromToRotation(sourceJoint, targetJoint);
+            strand.localPosition = Vector3.Lerp(strand.localPosition, (headJoint + tailJoint) * 0.5f, lerper);
+            strand.localRotation.SetFromToRotation(headJoint, tailJoint);
 		}
+
+        // Multi-strand update!
+        foreach (Transform strand in _strands)
+        {
+            KinectStrandPosition positioner = strand.gameObject.GetComponent<KinectStrandPosition>();
+            Vector3 headJoint = GetVector3FromJoint(body.Joints[positioner.head]);
+            Vector3 tailJoint = GetVector3FromJoint(body.Joints[positioner.tail]);
+            Vector3 targetPosition = Vector3.Lerp(headJoint, tailJoint, positioner.lerper);
+            strand.transform.localPosition = Vector3.Lerp(strand.localPosition, targetPosition, lerper);
+            strand.transform.localRotation.SetFromToRotation(headJoint, tailJoint);
+        }
     }
     
     private static Vector3 GetVector3FromJoint(Kinect.Joint joint)

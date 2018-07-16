@@ -53,7 +53,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SegmentPrefab: {fileID: 1073996666433634, guid: d500ecfb219b87e4082e932822d2c686,
     type: 2}
-  segmentCount: 5
+  segmentCount: 10
   useGravity: 1
   mass: 10
   drag: 1

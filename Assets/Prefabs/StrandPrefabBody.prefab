@@ -61,7 +61,7 @@ MonoBehaviour:
   spring: 0.1
   damper: 0
   minDistance: 0
-  maxDistance: 0.2
+  maxDistance: 0.5
   segmentDistanceX: 0
   segmentDistanceY: -0.05
   segmentDistanceZ: 0

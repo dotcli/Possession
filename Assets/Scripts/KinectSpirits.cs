@@ -7,7 +7,8 @@ public class KinectSpirits : MonoBehaviour
 {
     public GameObject BodySourceManager;
 
-    public GameObject strandTemplate;
+    public GameObject wingStrandTemplate;
+    public GameObject bodyStrandTemplate;
 
     public float lerper;
     
@@ -34,7 +35,7 @@ public class KinectSpirits : MonoBehaviour
         { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
         { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
         { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
-        { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
+        // { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
         
         // Right hand tip to shoulder spine
         { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
@@ -42,7 +43,7 @@ public class KinectSpirits : MonoBehaviour
         { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
         { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
         { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
-        { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
+        // { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
 
         // // Ass to Head
         // { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
@@ -98,11 +99,11 @@ public class KinectSpirits : MonoBehaviour
         // NOTE Strand initialization time!
         // need some changes to make the strand root locations more appealing
         foreach(KeyValuePair<Kinect.JointType, Kinect.JointType> bone in _BoneMap) {
-            GameObject strand = Instantiate(strandTemplate);
+            GameObject strand = Instantiate(wingStrandTemplate);
             strand.name = bone.ToString();
             strand.transform.parent = spirit.transform;
         }
-        
+
         return spirit;
     }
     

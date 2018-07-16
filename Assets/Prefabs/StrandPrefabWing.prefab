@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4746821123471510}
   - component: {fileID: 114464829057795930}
   m_Layer: 0
-  m_Name: StrandRootPrefab
+  m_Name: StrandPrefabWing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

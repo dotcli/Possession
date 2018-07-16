@@ -70,7 +70,7 @@ public class StrandRoot : MonoBehaviour {
 		// and pass head & tail to StretchToFit component
 		segments = new GameObject[segmentCount];
 		for (int k = 0; k < segmentCount; k++) {
-			GameObject segment = Instantiate(SegmentPrefab, Vector3.zero, Quaternion.identity);
+			GameObject segment = Instantiate(SegmentPrefab);
 			segments[k] = segment;
 			StretchToFit stretcher = segment.GetComponent<StretchToFit>();
 			// if it's the first one, set head to root's transform.

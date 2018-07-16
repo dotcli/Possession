@@ -247,7 +247,7 @@ MonoBehaviour:
     type: 2}
   bodyStrandTemplate: {fileID: 1358767409626216, guid: e497a2c15acc55741a3c335068abd3f1,
     type: 2}
-  lerper: 1
+  lerper: 0.5
   strandPerBone: 10
 --- !u!4 &917160787
 Transform:

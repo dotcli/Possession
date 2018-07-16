@@ -28,12 +28,14 @@ public class KinectSpirits : MonoBehaviour
         { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
         { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
         { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
+        // { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
         
         // Right hand tip to shoulder spine
         { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
         { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
         { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
         { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
+        // { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
     };
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMapBody = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {

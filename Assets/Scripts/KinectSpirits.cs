@@ -6,6 +6,8 @@ using Kinect = Windows.Kinect;
 public class KinectSpirits : MonoBehaviour 
 {
     public GameObject BodySourceManager;
+
+    public GameObject strandTemplate;
     
     private Dictionary<ulong, GameObject> _Spirits = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
@@ -91,14 +93,13 @@ public class KinectSpirits : MonoBehaviour
     {
         GameObject spirit = new GameObject("Spirit:" + id);
         
-        // TODO replace placeholder construction
-        // with actual strand attaching
+        // NOTE Strand initialization time!
+        // need some changes to make the strand root locations more appealing
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
-            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-            jointObj.name = jt.ToString();
-            jointObj.transform.parent = spirit.transform;
+            GameObject strand = Instantiate(strandTemplate);
+            strand.name = jt.ToString();
+            strand.transform.parent = spirit.transform;
         }
         
         return spirit;

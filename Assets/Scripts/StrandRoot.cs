@@ -78,4 +78,16 @@ public class StrandRoot : MonoBehaviour {
 	void Update () {
 		
 	}
+
+	// Destroy children before self destruct
+	void OnDestroy() {
+		// get rid of the segments
+		foreach (GameObject segment in segments) {
+			Destroy(segment);
+		}
+		// get rid of the danglers
+		foreach (GameObject dangler in danglers) {
+			Destroy(dangler);
+		}
+	}
 }
